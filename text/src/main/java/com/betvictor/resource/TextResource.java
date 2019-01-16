@@ -75,7 +75,7 @@ public class TextResource {
 	@GetMapping("/history")
 	@ApiOperation(value="get latest 10 executions")
 	public List<TextResponse> getHistory() {
-		return textRepository.findAll();
+		return textRepository.findTop10ByOrderByIdDescc();
 	}
 	
 	private HashMap<String, Integer> addWordsAndFrecuency(HashMap<String, Integer> frecuencies, String[] words){
