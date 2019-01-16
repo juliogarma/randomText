@@ -37,7 +37,7 @@ public class RandomTextResource {
 				
 		RestTemplate restTemplate = new RestTemplate();
 		ResponseEntity<RandomTextResponse> responseEntity   = restTemplate.exchange(parsedURL, HttpMethod.GET, entity, RandomTextResponse.class);
-
+		
 		return responseEntity.getBody();
 	}
 	

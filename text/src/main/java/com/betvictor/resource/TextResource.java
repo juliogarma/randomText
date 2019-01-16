@@ -20,6 +20,7 @@ public class TextResource {
 
 	private RandomTextResource randomTextResource;
 	private TextRepository textRepository;
+	private final String NO_WORDS_RESULT = "none";
 	
 	public TextResource(RandomTextResource rtr, TextRepository tr) {
 		randomTextResource = rtr;
@@ -61,7 +62,10 @@ public class TextResource {
 		res.setAvg_paragraph_size(calculateAverage(wordCounts));
 		res.setAvg_paragraph_processing_time(calculateAverage(processingTimes));
 		res.setTotal_processing_time(System.currentTimeMillis() - totalTimeIni);
-		res.setFreq_word(frecuencies.keySet().iterator().next());
+		if (!frecuencies.isEmpty())
+			res.setFreq_word(frecuencies.keySet().iterator().next());
+		else
+			res.setFreq_word(NO_WORDS_RESULT);
 		//add to repository
 		textRepository.save(res);
 		return res;
@@ -84,13 +88,13 @@ public class TextResource {
 	}
 	
 	private double calculateAverage(List <Long> elements) {
-		  Long sum = (long) 0;
-		  if(!elements.isEmpty()) {
-		    for (Long element : elements) {
-		        sum += element;
-		    }
-		    return sum / elements.size();
-		  }
-		  return sum;
-		}
+	  Long sum = (long) 0;
+	  if(!elements.isEmpty()) {
+	    for (Long element : elements) {
+	        sum += element;
+	    }
+	    return sum / elements.size();
+	  }
+	  return sum;
+	}
 }
