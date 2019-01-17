@@ -1,7 +1,6 @@
 package com.betvictor.resource;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -13,21 +12,14 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Data
 public class RandomTextResponse {
 
-	
 	private String type;
 	private long amount;
 	private long number;
 	private String text_out;
 	
-	public String getText_out() {
-		return text_out;
-	}
-	public void setText_out(String text_out) {
-		this.text_out = text_out;
-	}
-
 	public List<String> getParagraphs() {
 		Pattern p = Pattern.compile("<p>(.+?)</p>", Pattern.DOTALL);
 	    Matcher m = p.matcher(text_out);

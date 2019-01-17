@@ -1,8 +1,12 @@
 package com.betvictor.resource;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,8 +43,7 @@ public class TextResource {
 	public TextResponse get(int p_start, int p_end, int w_count_min, int w_count_max) {
 		long totalTimeIni = System.currentTimeMillis();
 		TextResponse res = new TextResponse();
-		List<RandomTextResponse> responses = new ArrayList<RandomTextResponse>();
-		HashMap<String, Integer> frecuencies = new HashMap<String, Integer>();
+		SortedMap<String, Integer> frecuencies = new TreeMap<String, Integer>();
 		List<Long> wordCounts = new ArrayList<Long>();
 		List<Long> processingTimes = new ArrayList<Long>();
 		//get one
@@ -61,11 +64,14 @@ public class TextResource {
 		//calculate average
 		res.setAvg_paragraph_size(calculateAverage(wordCounts));
 		res.setAvg_paragraph_processing_time(calculateAverage(processingTimes));
-		res.setTotal_processing_time(System.currentTimeMillis() - totalTimeIni);
+		
+		frecuencies = sortMapByValue (frecuencies);
+
 		if (!frecuencies.isEmpty())
 			res.setFreq_word(frecuencies.keySet().iterator().next());
 		else
 			res.setFreq_word(NO_WORDS_RESULT);
+		res.setTotal_processing_time(System.currentTimeMillis() - totalTimeIni);
 		//add to repository
 		textRepository.save(res);
 		return res;
@@ -75,15 +81,20 @@ public class TextResource {
 	@GetMapping("/history")
 	@ApiOperation(value="get latest 10 executions")
 	public List<TextResponse> getHistory() {
-		return textRepository.findTop10ByOrderByIdDescc();
+		List<TextResponse> res = textRepository.findTop10ByOrderByIdDesc();
+		if (res.size()>10) {
+			res = res.subList(0, 10);
+		}
+		return res;
 	}
 	
-	private HashMap<String, Integer> addWordsAndFrecuency(HashMap<String, Integer> frecuencies, String[] words){
+	private SortedMap<String, Integer> addWordsAndFrecuency(SortedMap<String, Integer> frecuencies, String[] words){
 		
 		for (String word:words) {
-			int index = frecuencies.get(word)==null?0:frecuencies.get(word);
-			frecuencies.put(word, index++);
+			int index = frecuencies.get(word.toLowerCase())==null?1:frecuencies.get(word.toLowerCase());
+			frecuencies. put(word.toLowerCase(), ++index);
 		}
+		
 		return frecuencies;
 	}
 	
@@ -96,5 +107,27 @@ public class TextResource {
 	    return sum / elements.size();
 	  }
 	  return sum;
+	}
+	
+	
+	public static TreeMap<String, Integer> sortMapByValue(Map<String, Integer> map){
+		Comparator<String> comparator = new ValueComparator(map);
+		TreeMap<String, Integer> result = new TreeMap<String, Integer>(comparator);
+		result.putAll(map);
+		return result;
+	}
+}
+
+class ValueComparator implements Comparator {
+	Map map;
+ 
+	public ValueComparator(Map map) {
+		this.map = map;
+	}
+ 
+	public int compare(Object keyA, Object keyB) {
+		Comparable valueA = (Comparable) map.get(keyA);
+		Comparable valueB = (Comparable) map.get(keyB);
+		return valueB.compareTo(valueA);
 	}
 }

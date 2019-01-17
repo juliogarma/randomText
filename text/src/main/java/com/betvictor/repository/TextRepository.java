@@ -13,5 +13,5 @@ public interface TextRepository extends JpaRepository<TextResponse, Long>{
 
 	
 	@Query("FROM TextResponse ORDER BY id DESC")
-	List<TextResponse> findTop10ByOrderByIdDescc();
+	List<TextResponse> findTop10ByOrderByIdDesc();
 }
